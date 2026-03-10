@@ -50,7 +50,10 @@ const HospitalMap: React.FC = () => {
      * 지도 객체(map)가 준비되었을 때 마커와 클러스터링을 렌더링합니다.
      */
     useEffect(() => {
-        if (!map) return;
+        // map, naver 객체, MarkerClustering 라이브러리가 완전히 로드되지 않았다면 렌더링을 방어합니다.
+        if (!map || !window.naver || !window.naver.maps || !window.MarkerClustering) {
+            return;
+        }
 
         // 기존 마커 및 클러스터러 제거 (초기화)
         markersRef.current.forEach(marker => marker.setMap(null));
@@ -116,12 +119,14 @@ const HospitalMap: React.FC = () => {
             content: `
             <div style="cursor:pointer;width:40px;height:40px;line-height:42px;background:rgba(59, 130, 246, 0.9);color:white;text-align:center;border-radius:50%;font-weight:bold;box-shadow:0 0 10px rgba(0,0,0,0.2); border: 2px solid white;"></div>
         `,
+            // 의존성 방어: 120번 라인 근처에서 발생하는 null의 원인은 window.naver.maps.Size 호출 때문입니다. 
+            // 위에서 return으로 방어하고 있으므로 여기서는 안전하지만 재차 확인합니다.
             size: new window.naver.maps.Size(40, 40),
             anchor: new window.naver.maps.Point(20, 20)
         };
 
         // 오픈소스 MarkerClustering 외부 라이브러리 활용
-        if (window.MarkerClustering && newMarkers.length > 0) {
+        if (newMarkers.length > 0) {
             clustererRef.current = new window.MarkerClustering({
                 minClusterSize: 2,           // 2개 이상 모이면 클러스터 생성
                 maxZoom: 14,                 // 줌 레벨 14 이상이면 클러스터 해제

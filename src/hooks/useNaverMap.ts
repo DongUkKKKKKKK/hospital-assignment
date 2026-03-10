@@ -26,35 +26,58 @@ export const useNaverMap = (
     const initialized = useRef(false);
 
     useEffect(() => {
-        // 지도 객체를 담을 DOM 요소가 없거나 기본 객체가 로드되지 않은 상태라면 중지
-        if (!mapElement.current || !window.naver || !window.naver.maps) {
-            console.warn('Map element or Naver Maps API is not loaded yet.');
-            return;
-        }
+        const initMap = () => {
+            // 지도 객체를 담을 DOM 요소가 없거나 기본 객체가 로드되지 않은 상태라면 중지
+            if (!mapElement.current || !window.naver || !window.naver.maps) {
+                return;
+            }
 
-        // 이미 지도가 초기화되었다면 중복 초기화를 막음
-        if (initialized.current) return;
+            // 이미 지도가 초기화되었다면 중복 초기화를 막음
+            if (initialized.current) return;
 
-        // 초기 중심 좌표 설정: 전달받은 파라미터가 없으면 서울 시청 등 기본값 사용
-        const centerLatLng = initialCenter
-            ? new window.naver.maps.LatLng(initialCenter.lat, initialCenter.lng)
-            : new window.naver.maps.LatLng(37.5666805, 126.9784147); // 서울 시청
+            // 초기 중심 좌표 설정: 전달받은 파라미터가 없으면 서울 시청 등 기본값 사용
+            const centerLatLng = initialCenter
+                ? new window.naver.maps.LatLng(initialCenter.lat, initialCenter.lng)
+                : new window.naver.maps.LatLng(37.5666805, 126.9784147); // 서울 시청
 
-        // 지도 옵션 설정 (줌 컨트롤 등)
-        const mapOptions: naver.maps.MapOptions = {
-            center: centerLatLng,
-            zoom: 13,
-            minZoom: 7,
-            zoomControl: true,
-            zoomControlOptions: {
-                position: window.naver.maps.Position.TOP_RIGHT,
-            },
+            // 지도 옵션 설정 (줌 컨트롤 등)
+            const mapOptions: naver.maps.MapOptions = {
+                center: centerLatLng,
+                zoom: 13,
+                minZoom: 7,
+                zoomControl: true,
+                zoomControlOptions: {
+                    position: window.naver.maps.Position.TOP_RIGHT,
+                },
+            };
+
+            // 네이버 지도 객체 생성 및 상태 저장
+            const createdMap = new window.naver.maps.Map(mapElement.current, mapOptions);
+            setMap(createdMap);
+            initialized.current = true;
         };
 
-        // 네이버 지도 객체 생성 및 상태 저장
-        const createdMap = new window.naver.maps.Map(mapElement.current, mapOptions);
-        setMap(createdMap);
-        initialized.current = true;
+        // 스크립트가 로드되었는지 체크하고 초기화
+        if (window.naver && window.naver.maps) {
+            initMap();
+        } else {
+            // 네이버 지도 스크립트가 로드 완료될 때까지 대기
+            const mapScript = document.getElementById('naver-map-script');
+            if (mapScript) {
+                mapScript.addEventListener('load', initMap);
+            } else {
+                // 스크립트 태그가 명시적 ID가 없는 경우 폴링 방식으로 대기
+                const checkNaverMaps = setInterval(() => {
+                    if (window.naver && window.naver.maps) {
+                        clearInterval(checkNaverMaps);
+                        initMap();
+                    }
+                }, 100);
+
+                // 메모리 릭 방지를 위한 타임아웃
+                setTimeout(() => clearInterval(checkNaverMaps), 10000);
+            }
+        }
 
     }, [mapElement, initialCenter]);
 

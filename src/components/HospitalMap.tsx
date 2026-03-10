@@ -5,6 +5,14 @@ import type { RootState, AppDispatch } from '../store';
 import { setSelectedHospitalId } from '../store/slices/hospitalSlice';
 import { useNaverMap } from '../hooks/useNaverMap';
 
+// MarkerClustering 라이브러리의 임시 타입 선언 (any 대체)
+interface ClusterMarkerElement {
+    getElement: () => HTMLElement;
+}
+interface MarkerClusteringInstance {
+    setMap: (map: naver.maps.Map | null) => void;
+}
+
 /**
  * 네이버 지도를 렌더링하고, 스토어의 병원 목록(filtered)을 바탕으로 마커와 클러스터링을 그리는 컴포넌트입니다.
  */
@@ -21,7 +29,7 @@ const HospitalMap: React.FC = () => {
 
     // 마커 인스턴스 배열과 클러스터러, 인포윈도우 관리용 Ref
     const markersRef = useRef<naver.maps.Marker[]>([]);
-    const clustererRef = useRef<any>(null); // MarkerClustering
+    const clustererRef = useRef<MarkerClusteringInstance | null>(null);
     const infoWindowRef = useRef<naver.maps.InfoWindow | null>(null);
 
     // 필터링된 배열 도출
@@ -143,7 +151,7 @@ const HospitalMap: React.FC = () => {
                     gridSize: 120,               // 클러스터를 묶을 격자 크기
                     icons: [htmlMarker1],        // 클러스터 아이콘 배열 (여기선 1개로 통일)
                     indexGenerator: [10, 100, 200, 500, 1000],
-                    stylingFunction: (clusterMarker: any, count: number) => {
+                    stylingFunction: (clusterMarker: ClusterMarkerElement, count: number) => {
                         // HTMLElement 내부 텍스트로 안전하게 마커 개수 삽입
                         const element = clusterMarker.getElement();
                         if (element && element.firstElementChild) {

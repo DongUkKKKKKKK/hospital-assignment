@@ -35,7 +35,7 @@ const HospitalMap: React.FC = () => {
 
     // 렌더링 최적화를 위한 병원 리스트 필터링 메모이제이션
     const filteredHospitals = useMemo(() => {
-        if (filter === '전체') return hospitals;
+        if (filter === '진료 과목 전체') return hospitals;
         return hospitals.filter((h) => h.department === filter);
     }, [hospitals, filter]);
 

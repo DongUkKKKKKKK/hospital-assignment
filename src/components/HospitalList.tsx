@@ -23,7 +23,7 @@ const HospitalList: React.FC = () => {
     // 병원 진료 과목 고유 목록 추출 (필터 드롭다운용)
     const departments = useMemo(() => {
         const list = new Set(hospitals.map((h) => h.department));
-        return ['전체', ...Array.from(list)];
+        return ['진료 과목 전체', ...Array.from(list)];
     }, [hospitals]);
 
     /**
@@ -32,7 +32,7 @@ const HospitalList: React.FC = () => {
      */
     const filteredHospitals = useMemo(() => {
         let result = hospitals;
-        if (filter !== '전체') {
+        if (filter !== '진료 과목 전체') {
             result = hospitals.filter((h) => h.department === filter);
         }
 
@@ -125,7 +125,7 @@ const HospitalList: React.FC = () => {
                 >
                     {departments.map((dept) => (
                         <option key={dept} value={dept}>
-                            {dept === '전체' ? '진료 과목 전체' : dept}
+                            {dept}
                         </option>
                     ))}
                 </select>

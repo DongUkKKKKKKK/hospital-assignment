@@ -27,7 +27,7 @@ const initialState: HospitalState = {
     userLocation: null,
     hospitals: [],
     selectedHospitalId: null,
-    filter: '전체',
+    filter: '진료 과목 전체',
     status: 'idle',
 };
 

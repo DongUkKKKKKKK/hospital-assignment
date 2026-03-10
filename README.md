@@ -5,19 +5,25 @@
 
 ## 🚀 실행 방법
 
-본 프로젝트는 최신 React(18)와 Vite 환경에서 구성되었습니다. 프로젝트 실행 전, 반드시 컴포넌트 의존성을 설치하고 루트 경로에 `.env.local` 파일을 확인해주세요.
+본 프로젝트는 최신 React(18)와 Vite 환경에서 구성되었습니다. 프로젝트 실행 전, 반드시 컴포넌트 의존성을 설치하고 루트 경로에 `.env.local` 파일을 세팅해야 합니다.
 
 ```bash
 # 1. 패키지 및 의존성 환경 설치 (Google Maps 필수 모듈 포함)
 npm install
 npm install @react-google-maps/api @googlemaps/markerclusterer
 
-# 2. 구글 지도 인증 키 환경 변수 세팅 (.env.local)
-# 사용자 본인의 Google Maps API Key가 기입되어 있어야 합니다.
-# VITE_GOOGLE_MAPS_API_KEY="YOUR_KEY_HERE"
+# 2. 구글 지도 API 키 세팅
+# 프로젝트 루트 디렉토리에 .env.local 파일을 생성하고 아래와 같이 내용을 작성합니다.
+# VITE_GOOGLE_MAPS_API_KEY="본인이 발급받은 구글 맵 API KEY 입력"
 
-# 3. 로컬 개발 서버 환경 실행
+# 예를 들어 터미널에서 아래 명령어로 바로 생성 가능합니다.
+echo 'VITE_GOOGLE_MAPS_API_KEY="YOUR_KEY_HERE"' > .env.local
+
+# 3. 로컬 웹스토어 개발 서버 환경 실행
 npm run dev
+
+# 4. 브라우저에서 서버 주소 접속
+# 기본적으로 http://localhost:3000 으로 연결됩니다.
 ```
 
 ## 🛠 기술적 의사결정 (과제 요구사항 준수 및 최적화 전략)

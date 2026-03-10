@@ -184,22 +184,23 @@ const HospitalMap: React.FC = () => {
                 </GoogleMap>
             )}
 
-            {/* 플로팅 내 위치로 이동 버튼 */}
+            {/* 플로팅 내 위치로 이동 버튼 (대형/명시적 UX 개선) */}
             {isLoaded && status === 'succeeded' && userLocation && (
                 <button
                     onClick={() => {
                         if (map) {
                             map.panTo({ lat: userLocation.lat, lng: userLocation.lng });
-                            map.setZoom(14);
+                            map.setZoom(15);
                         }
                     }}
-                    className="absolute bottom-6 right-6 bg-white p-3 rounded-full shadow-lg border border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all z-10 flex items-center justify-center group"
-                    title="내 위치로 이동"
+                    className="absolute bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3.5 rounded-full shadow-2xl border-2 border-white hover:scale-105 transition-all duration-300 z-10 flex items-center justify-center space-x-2 font-bold group"
+                    title="내 위치로 바로가기"
                 >
-                    <svg className="w-6 h-6 text-blue-600 group-hover:text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <svg className="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
+                    <span>내 위치 찾기</span>
                 </button>
             )}
         </div>

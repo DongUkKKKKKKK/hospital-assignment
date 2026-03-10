@@ -36,15 +36,15 @@ const HospitalDetail: React.FC = () => {
     return (
         <div className="absolute inset-y-0 left-0 w-full md:w-[350px] lg:w-[400px] bg-white shadow-2xl z-20 flex flex-col transform transition-transform duration-300 ease-in-out border-r border-gray-200">
             {/* Header: 뒤로가기 버튼 */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
+            <div className="p-3 border-b border-gray-200 bg-white sticky top-0 z-10 shadow-sm">
                 <button
                     onClick={handleClose}
-                    className="flex items-center text-gray-600 hover:text-blue-600 font-medium transition-colors"
+                    className="flex items-center justify-center w-full py-3 text-gray-700 hover:text-blue-700 hover:bg-blue-50 bg-gray-50 rounded-lg font-bold text-lg transition-all border border-gray-200"
                 >
-                    <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
-                    목록으로 돌아가기
+                    리스트로 뒤로가기
                 </button>
             </div>
 

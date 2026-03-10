@@ -74,84 +74,88 @@ const HospitalMap: React.FC = () => {
             infoWindowRef.current.close();
         }
 
-        // 새 마커들을 생성합니다.
-        const newMarkers: naver.maps.Marker[] = [];
+        try {
+            // 새 마커들을 생성합니다.
+            const newMarkers: naver.maps.Marker[] = [];
 
-        filteredHospitals.forEach((hospital) => {
-            // hospital.json에서 가져온 값이 문자열일 수 있으므로 명시적으로 Number()로 변환합니다.
-            const position = new window.naver.maps.LatLng(Number(hospital.lat), Number(hospital.lng));
+            filteredHospitals.forEach((hospital) => {
+                // hospital.json에서 가져온 값이 문자열일 수 있으므로 명시적으로 Number()로 변환합니다.
+                const position = new window.naver.maps.LatLng(Number(hospital.lat), Number(hospital.lng));
 
-            const marker = new window.naver.maps.Marker({
-                position,
-                map,
-                // icon 등 필요에 따라 커스터마이징 가능
-            });
+                const marker = new window.naver.maps.Marker({
+                    position,
+                    map,
+                    // icon 등 필요에 따라 커스터마이징 가능
+                });
 
-            // 마커 클래스/객체에 병원 고유 id 임시 저장 (인포윈도우, 클릭 식별용)
-            marker.set('id', hospital.id);
+                // 마커 클래스/객체에 병원 고유 id 임시 저장 (인포윈도우, 클릭 식별용)
+                marker.set('id', hospital.id);
 
-            // 마커 클릭 이벤트 핸들러: 스토어에 selectedHospitalId 업데이트 및 인포윈도우 표시
-            window.naver.maps.Event.addListener(marker, 'click', () => {
-                dispatch(setSelectedHospitalId(hospital.id));
+                // 마커 클릭 이벤트 핸들러: 스토어에 selectedHospitalId 업데이트 및 인포윈도우 표시
+                window.naver.maps.Event.addListener(marker, 'click', () => {
+                    dispatch(setSelectedHospitalId(hospital.id));
 
-                // 인포윈도우 UI 생성 (dangerouslySetInnerHTML 없이 안전한 DOM 문자열 구성)
-                const infoContent = `
-          <div style="padding: 16px; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); min-width: 200px; border: 1px solid #e5e7eb;">
-            <h4 style="font-weight: 700; font-size: 16px; margin: 0 0 8px 0; color: #1f2937;">${hospital.name}</h4>
-            <p style="font-size: 13px; color: #4b5563; margin: 0 0 6px 0;">${hospital.address}</p>
-            <span style="display: inline-block; padding: 4px 8px; font-size: 11px; font-weight: 600; background: #dbeafe; color: #1e40af; border-radius: 9999px;">${hospital.department}</span>
-          </div>
-        `;
+                    // 인포윈도우 UI 생성 (dangerouslySetInnerHTML 없이 안전한 DOM 문자열 구성)
+                    const infoContent = `
+              <div style="padding: 16px; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); min-width: 200px; border: 1px solid #e5e7eb;">
+                <h4 style="font-weight: 700; font-size: 16px; margin: 0 0 8px 0; color: #1f2937;">${hospital.name}</h4>
+                <p style="font-size: 13px; color: #4b5563; margin: 0 0 6px 0;">${hospital.address}</p>
+                <span style="display: inline-block; padding: 4px 8px; font-size: 11px; font-weight: 600; background: #dbeafe; color: #1e40af; border-radius: 9999px;">${hospital.department}</span>
+              </div>
+            `;
 
-                if (infoWindowRef.current) {
-                    infoWindowRef.current.setContent(infoContent);
-                    infoWindowRef.current.open(map, marker);
-                }
-
-                // 클릭 시 마커를 화면 중심으로 부드럽게 이동
-                map.panTo(position);
-            });
-
-            newMarkers.push(marker);
-        });
-
-        markersRef.current = newMarkers;
-
-        /**
-         * MarkerClustering 초기화 (대량 마커 최적화 처리)
-         * htmlIcon1 등은 클러스터 노출 시의 UI를 정의합니다.
-         */
-        const htmlMarker1 = {
-            content: `
-            <div style="cursor:pointer;width:40px;height:40px;line-height:42px;background:rgba(59, 130, 246, 0.9);color:white;text-align:center;border-radius:50%;font-weight:bold;box-shadow:0 0 10px rgba(0,0,0,0.2); border: 2px solid white;"></div>
-        `,
-            // 의존성 방어: 120번 라인 근처에서 발생하는 null의 원인은 window.naver.maps.Size 호출 때문입니다. 
-            // 위에서 return으로 방어하고 있으므로 여기서는 안전하지만 재차 확인합니다.
-            size: new window.naver.maps.Size(40, 40),
-            anchor: new window.naver.maps.Point(20, 20)
-        };
-
-        // 오픈소스 MarkerClustering 외부 라이브러리 활용
-        if (newMarkers.length > 0) {
-            clustererRef.current = new window.MarkerClustering({
-                minClusterSize: 2,           // 2개 이상 모이면 클러스터 생성
-                maxZoom: 14,                 // 줌 레벨 14 이상이면 클러스터 해제
-                map: map,                    // 적용할 대상 맵
-                markers: newMarkers,         // 대상 마커들
-                disableClickZoom: false,     // 클릭 시 줌 동작 허용
-                gridSize: 120,               // 클러스터를 묶을 격자 크기
-                icons: [htmlMarker1],        // 클러스터 아이콘 배열 (여기선 1개로 통일)
-                indexGenerator: [10, 100, 200, 500, 1000],
-                stylingFunction: (clusterMarker: any, count: number) => {
-                    // HTMLElement 내부 텍스트로 안전하게 마커 개수 삽입
-                    const element = clusterMarker.getElement();
-                    if (element && element.firstElementChild) {
-                        element.firstElementChild.textContent = count.toString();
-                        // 클릭 이벤트가 마커로 전파되도록 스타일 추가
-                        element.style.pointerEvents = 'auto';
+                    if (infoWindowRef.current) {
+                        infoWindowRef.current.setContent(infoContent);
+                        infoWindowRef.current.open(map, marker);
                     }
-                }
+
+                    // 클릭 시 마커를 화면 중심으로 부드럽게 이동
+                    map.panTo(position);
+                });
+
+                newMarkers.push(marker);
             });
+
+            markersRef.current = newMarkers;
+
+            /**
+             * MarkerClustering 초기화 (대량 마커 최적화 처리)
+             * htmlIcon1 등은 클러스터 노출 시의 UI를 정의합니다.
+             */
+            const htmlMarker1 = {
+                content: `
+                <div style="cursor:pointer;width:40px;height:40px;line-height:42px;background:rgba(59, 130, 246, 0.9);color:white;text-align:center;border-radius:50%;font-weight:bold;box-shadow:0 0 10px rgba(0,0,0,0.2); border: 2px solid white;"></div>
+            `,
+                // 의존성 방어: 120번 라인 근처에서 발생하는 null의 원인은 window.naver.maps.Size 호출 때문입니다. 
+                // 위에서 return으로 방어하고 있으므로 여기서는 안전하지만 재차 확인합니다.
+                size: new window.naver.maps.Size(40, 40),
+                anchor: new window.naver.maps.Point(20, 20)
+            };
+
+            // 오픈소스 MarkerClustering 외부 라이브러리 활용
+            if (newMarkers.length > 0) {
+                clustererRef.current = new window.MarkerClustering({
+                    minClusterSize: 2,           // 2개 이상 모이면 클러스터 생성
+                    maxZoom: 14,                 // 줌 레벨 14 이상이면 클러스터 해제
+                    map: map,                    // 적용할 대상 맵
+                    markers: newMarkers,         // 대상 마커들
+                    disableClickZoom: false,     // 클릭 시 줌 동작 허용
+                    gridSize: 120,               // 클러스터를 묶을 격자 크기
+                    icons: [htmlMarker1],        // 클러스터 아이콘 배열 (여기선 1개로 통일)
+                    indexGenerator: [10, 100, 200, 500, 1000],
+                    stylingFunction: (clusterMarker: any, count: number) => {
+                        // HTMLElement 내부 텍스트로 안전하게 마커 개수 삽입
+                        const element = clusterMarker.getElement();
+                        if (element && element.firstElementChild) {
+                            element.firstElementChild.textContent = count.toString();
+                            // 클릭 이벤트가 마커로 전파되도록 스타일 추가
+                            element.style.pointerEvents = 'auto';
+                        }
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Failed to render markers. Map might be in an invalid auth state.', error);
         }
     }, [map, filteredHospitals, dispatch]);
 
@@ -161,7 +165,14 @@ const HospitalMap: React.FC = () => {
      * 맵 상의 해당 정보와 연동하는 이펙트입니다.
      */
     useEffect(() => {
-        if (!map || !infoWindowRef.current || selectedHospitalId === null) return;
+        // 지도 자체가드 실패(Auth Error 등) 상태거나,
+        // 아직 로딩이 끝나지 않아 infoWindowRef가 없으면 안전하게 무시합니다.
+        if (!map || !infoWindowRef.current || selectedHospitalId === null) {
+            // 지도와 연동은 실패하더라도, 좌측 리스트의 Side Panel은 독립적으로 동작해야 하므로 
+            // 강제로 에러를 내뿜지 않고 조용히 리턴합니다. (UI 크래시 방지)
+            if (infoWindowRef.current) infoWindowRef.current.close();
+            return;
+        }
 
         // 현재 렌더링 된 마커 중 동일한 ID를 가진 마커 찾기
         const targetMarker = markersRef.current.find(
@@ -170,20 +181,26 @@ const HospitalMap: React.FC = () => {
         const targetHospital = filteredHospitals.find(h => h.id === selectedHospitalId);
 
         if (targetMarker && targetHospital) {
-            // 인포윈도우 열기 및 중심점 이동
-            const infoContent = `
-        <div style="padding: 16px; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); min-width: 200px; border: 1px solid #e5e7eb;">
-          <h4 style="font-weight: 700; font-size: 16px; margin: 0 0 8px 0; color: #1f2937;">${targetHospital.name}</h4>
-          <p style="font-size: 13px; color: #4b5563; margin: 0 0 6px 0;">${targetHospital.address}</p>
-          <span style="display: inline-block; padding: 4px 8px; font-size: 11px; font-weight: 600; background: #dbeafe; color: #1e40af; border-radius: 9999px;">${targetHospital.department}</span>
-        </div>
-      `;
-            infoWindowRef.current.setContent(infoContent);
-            infoWindowRef.current.open(map, targetMarker);
-            map.panTo(targetMarker.getPosition());
+            try {
+                // 인포윈도우 열기 및 중심점 이동
+                const infoContent = `
+            <div style="padding: 16px; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); min-width: 200px; border: 1px solid #e5e7eb;">
+              <h4 style="font-weight: 700; font-size: 16px; margin: 0 0 8px 0; color: #1f2937;">${targetHospital.name}</h4>
+              <p style="font-size: 13px; color: #4b5563; margin: 0 0 6px 0;">${targetHospital.address}</p>
+              <span style="display: inline-block; padding: 4px 8px; font-size: 11px; font-weight: 600; background: #dbeafe; color: #1e40af; border-radius: 9999px;">${targetHospital.department}</span>
+            </div>
+          `;
+                infoWindowRef.current.setContent(infoContent);
+                infoWindowRef.current.open(map, targetMarker);
+                map.panTo(targetMarker.getPosition());
+            } catch (error) {
+                console.warn('Map interaction failed due to partial API load state.', error);
+            }
         } else {
             // ID 매칭 마커가 없으면 인포윈도우 숨김 (다른 탭이나 상태 클리어 시)
-            infoWindowRef.current.close();
+            try {
+                infoWindowRef.current.close();
+            } catch (e) { }
         }
     }, [map, selectedHospitalId, filteredHospitals]);
 
@@ -193,11 +210,21 @@ const HospitalMap: React.FC = () => {
             <div ref={mapElement} className="absolute inset-0 w-full h-full" id="map-container" />
 
             {/* 지도 로딩 전 임시 문구 처리 등 추가 가능 */}
-            {!map && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-100/80 z-10 backdrop-blur-sm">
-                    <div className="text-gray-500 font-medium">지도를 초기화하는 중입니다...</div>
+            {!window.naver || !window.naver.maps ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
+                    <div className="flex flex-col items-center">
+                        <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+                        <div className="text-gray-600 font-medium">네이버 지도 스크립트를 불러오는 중입니다...</div>
+                    </div>
                 </div>
-            )}
+            ) : status !== 'succeeded' ? (
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100/80 z-10 backdrop-blur-sm">
+                    <div className="flex flex-col items-center">
+                        <div className="w-10 h-10 border-4 border-green-200 border-t-green-600 rounded-full animate-spin mb-4"></div>
+                        <div className="text-gray-700 font-medium text-lg drop-shadow">지도 데이터를 불러오는 중입니다...</div>
+                    </div>
+                </div>
+            ) : null}
         </div>
     );
 };

@@ -4,6 +4,15 @@ import type { RootState, AppDispatch } from '../store';
 import { setSelectedHospitalId, setFilter, fetchHospitals } from '../store/slices/hospitalSlice';
 import { getDistanceInMeters } from '../utils/distance';
 
+const DEPARTMENT_MAP: Record<string, string> = {
+    INTERNAL: '내과',
+    ORTHOPEDIC: '정형외과',
+    PEDIATRIC: '소아과',
+    OPHTHALMOLOGY: '안과',
+    DERMATOLOGY: '피부과',
+    DENTAL: '치과'
+};
+
 /**
  * 전역 상태에서 병원 목록을 가져와 렌더링하고, 진료과목 필터링 기능을 제공하는 리스트 컴포넌트.
  * 선택된 병원 항목을 지도와 동기화하여 강조 표시(Highlight) 합니다.
@@ -20,10 +29,10 @@ const HospitalList: React.FC = () => {
     const centerLat = userLocation ? userLocation.lat : 37.5666805;
     const centerLng = userLocation ? userLocation.lng : 126.9784147;
 
-    // 병원 진료 과목 고유 목록 추출 (필터 드롭다운용)
-    const departments = useMemo(() => {
+    // 병원 진료 과목 고유 목록 추출 (원래 영어 데이터 유지)
+    const rawDepartments = useMemo(() => {
         const list = new Set(hospitals.map((h) => h.department));
-        return ['진료 과목 전체', ...Array.from(list)];
+        return Array.from(list);
     }, [hospitals]);
 
     /**
@@ -123,9 +132,10 @@ const HospitalList: React.FC = () => {
                     onChange={handleFilterChange}
                     className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 >
-                    {departments.map((dept) => (
+                    <option value="진료 과목 전체">진료 과목 전체</option>
+                    {rawDepartments.map((dept) => (
                         <option key={dept} value={dept}>
-                            {dept}
+                            {DEPARTMENT_MAP[dept] || dept}
                         </option>
                     ))}
                 </select>
@@ -157,8 +167,8 @@ const HospitalList: React.FC = () => {
                                 {hospital.address}
                             </p>
                             <div className="flex items-center justify-between">
-                                <div className="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 uppercase tracking-wider">
-                                    {hospital.department}
+                                <div className="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 tracking-wider">
+                                    {DEPARTMENT_MAP[hospital.department] || hospital.department}
                                 </div>
                                 <span className="text-xs font-medium text-gray-500">
                                     거리: {(getDistanceInMeters(centerLat, centerLng, Number(hospital.lat), Number(hospital.lng)) / 1000).toFixed(1)}km

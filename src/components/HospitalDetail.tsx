@@ -4,6 +4,15 @@ import type { RootState, AppDispatch } from '../store';
 import { setSelectedHospitalId } from '../store/slices/hospitalSlice';
 import { getDistanceInMeters } from '../utils/distance';
 
+const DEPARTMENT_MAP: Record<string, string> = {
+    INTERNAL: '내과',
+    ORTHOPEDIC: '정형외과',
+    PEDIATRIC: '소아과',
+    OPHTHALMOLOGY: '안과',
+    DERMATOLOGY: '피부과',
+    DENTAL: '치과'
+};
+
 const HospitalDetail: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
 
@@ -54,8 +63,8 @@ const HospitalDetail: React.FC = () => {
                     <h2 className="text-2xl font-bold tracking-tight text-gray-900 mb-2">
                         {hospital.name}
                     </h2>
-                    <span className="inline-block px-3 py-1.5 text-sm font-semibold rounded-full bg-blue-100 text-blue-800 uppercase tracking-wider">
-                        {hospital.department}
+                    <span className="inline-block px-3 py-1.5 text-sm font-semibold rounded-full bg-blue-100 text-blue-800 tracking-wider">
+                        {DEPARTMENT_MAP[hospital.department] || hospital.department}
                     </span>
                 </div>
 

@@ -42,7 +42,7 @@ const App: React.FC = () => {
         왼쪽 패널: 상세 정보가 열렸을 땐 HospitalDetail, 평소엔 HospitalList 노출.
         웹 풀사이즈 대응 (md:w-[450px] 등 고정 혹은 유연한 사이드바 너비)
       */}
-      <div className="relative w-full md:w-[400px] lg:w-[450px] h-[50vh] md:h-full shadow-[4px_0_24px_rgba(0,0,0,0.08)] z-20 overflow-hidden flex flex-col bg-white">
+      <div className="relative w-full md:w-[400px] lg:w-[450px] h-[50vh] md:h-full z-20 overflow-hidden flex flex-col bg-white border-r border-gray-200">
         {selectedHospitalId ? (
           <div className="w-full h-full animate-slideInLeft">
             <HospitalDetail />

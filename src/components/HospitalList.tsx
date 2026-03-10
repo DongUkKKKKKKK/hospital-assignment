@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
-import { setSelectedHospitalId, setFilter } from '../store/slices/hospitalSlice';
+import { setSelectedHospitalId, setFilter, fetchHospitals } from '../store/slices/hospitalSlice';
 import { getDistanceInMeters } from '../utils/distance';
 
 /**
@@ -49,17 +49,63 @@ const HospitalList: React.FC = () => {
         dispatch(setFilter(e.target.value));
     };
 
+    // 리스트 아이템 DOM 요소를 추적하기 위한 Ref (scrollIntoView 용도)
+    const itemRefs = useRef<{ [key: number]: HTMLLIElement | null }>({});
+
+    // 외부(예: 지도 마커)에서 selectedHospitalId가 변경되면 해당 리스트 아이템으로 스크롤 이동
+    useEffect(() => {
+        if (selectedHospitalId !== null && itemRefs.current[selectedHospitalId]) {
+            itemRefs.current[selectedHospitalId]?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+            });
+        }
+    }, [selectedHospitalId]);
+
     // 병원 선택 클릭 핸들러
     const handleSelectHospital = (id: number) => {
         dispatch(setSelectedHospitalId(id));
     };
 
     if (status === 'loading') {
-        return <div className="p-4 bg-white h-full shadow-md text-gray-500">데이터를 불러오는 중입니다...</div>;
+        return (
+            <div className="flex flex-col h-full bg-white shadow-lg overflow-hidden border-r border-gray-200">
+                <div className="p-4 border-b border-gray-200 bg-gray-50 flex-none animate-pulse">
+                    <div className="h-6 bg-gray-300 rounded w-1/3 mb-4"></div>
+                    <div className="h-10 bg-gray-200 rounded mb-2 w-full"></div>
+                </div>
+                <div className="flex-1 p-4 space-y-4">
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className="p-4 rounded-xl border border-gray-100 animate-pulse flex flex-col space-y-3">
+                            <div className="h-5 bg-gray-300 rounded w-3/4"></div>
+                            <div className="h-4 bg-gray-200 rounded w-full"></div>
+                            <div className="flex justify-between items-center mt-2">
+                                <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+                                <div className="h-4 bg-gray-200 rounded w-12"></div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
     }
 
     if (status === 'failed') {
-        return <div className="p-4 bg-white h-full shadow-md text-red-500">데이터를 불러오지 못했습니다.</div>;
+        return (
+            <div className="flex flex-col items-center justify-center p-8 bg-white h-full shadow-lg border-r border-gray-200 text-center">
+                <svg className="w-16 h-16 text-red-400 mb-6 drop-shadow-sm" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <h3 className="text-lg font-bold text-gray-800 mb-2">데이터를 불러오지 못했습니다.</h3>
+                <p className="text-gray-500 mb-6 text-sm">네트워크 상태를 확인하거나 잠시 후 다시 시도해주세요.</p>
+                <button
+                    onClick={() => dispatch(fetchHospitals())}
+                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold rounded-lg shadow-md transition-all duration-200 ease-in-out transform hover:-translate-y-0.5"
+                >
+                    다시 시도
+                </button>
+            </div>
+        );
     }
 
     return (
@@ -96,6 +142,7 @@ const HospitalList: React.FC = () => {
                     return (
                         <li
                             key={hospital.id}
+                            ref={(el) => { itemRefs.current[hospital.id] = el; }}
                             onClick={() => handleSelectHospital(hospital.id)}
                             className={`p-4 rounded-xl cursor-pointer transition-all duration-200 border ${isSelected
                                 ? 'bg-blue-50 border-blue-500 shadow-md transform scale-[1.02]'

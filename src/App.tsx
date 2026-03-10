@@ -1,19 +1,35 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
-import { fetchHospitals } from './store/slices/hospitalSlice';
-import type { AppDispatch } from './store';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchHospitals, setUserLocation } from './store/slices/hospitalSlice';
+import type { AppDispatch, RootState } from './store';
 import HospitalList from './components/HospitalList';
 import HospitalMap from './components/HospitalMap';
 import HospitalDetail from './components/HospitalDetail';
-import { useSelector } from 'react-redux';
-import type { RootState } from './store';
 import './App.css'; // Vite 기본 CSS 임시 유지
 
 const App: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // 애플리케이션 최상단에서 최초 마운트 시 데이터 fetch 실행
+  // 애플리케이션 최상단에서 최초 마운트 시 데이터 fetch 실행 및 위치 권한 요청
   useEffect(() => {
+    // 위치 권한 및 사용자 위경도 확인
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          dispatch(setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          }));
+        },
+        (error) => {
+          console.warn("Geolocation Error:", error);
+          alert('위치 권한이 차단되었거나 위치를 가져올 수 없습니다.\n기본 위치(서울시청)를 기준으로 거리 정렬을 시작합니다.');
+        }
+      );
+    } else {
+      alert('현재 사용 중인 브라우저가 위치 기반 서비스를 지원하지 않습니다.\n기본 위치(서울시청)를 사용합니다.');
+    }
+
     dispatch(fetchHospitals());
   }, [dispatch]);
 

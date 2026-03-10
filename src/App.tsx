@@ -37,12 +37,11 @@ const App: React.FC = () => {
   const selectedHospitalId = useSelector((state: RootState) => state.hospital.selectedHospitalId);
 
   return (
-    <div className="w-screen h-screen flex flex-col md:flex-row overflow-hidden bg-white text-gray-800 font-sans">
+    <div className="flex w-full h-screen overflow-hidden bg-white text-gray-800 font-sans">
       {/* 
         왼쪽 패널: 상세 정보가 열렸을 땐 HospitalDetail, 평소엔 HospitalList 노출.
-        웹 풀사이즈 대응 (md:w-[450px] 등 고정 혹은 유연한 사이드바 너비)
       */}
-      <div className="relative w-full md:w-[400px] lg:w-[450px] h-[50vh] md:h-full z-20 overflow-hidden flex flex-col bg-white border-r border-gray-200">
+      <div className="relative w-[350px] md:w-[400px] h-full z-20 overflow-hidden flex flex-col bg-white">
         {selectedHospitalId ? (
           <div className="w-full h-full animate-slideInLeft">
             <HospitalDetail />
@@ -54,8 +53,8 @@ const App: React.FC = () => {
         )}
       </div>
 
-      {/* 오른쪽 패널: 구글 지도 (나머지 영역 전체 차지) */}
-      <div className="flex-1 w-full h-[50vh] md:h-full relative z-10 bg-gray-100">
+      {/* 오른쪽 패널: 구글 지도 (나머지 영역 전체 차지) gap 0 */}
+      <div className="flex-1 h-full relative z-10 bg-gray-100">
         <HospitalMap />
       </div>
     </div>

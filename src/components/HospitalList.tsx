@@ -119,9 +119,9 @@ const HospitalList: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col h-full bg-white shadow-lg overflow-hidden border-r border-gray-200">
+        <div className="flex flex-col h-full bg-white border-r border-gray-200">
             {/* 고정된 헤더 영역 */}
-            <div className="p-4 border-b border-gray-200 bg-gray-50 flex-none">
+            <div className="p-3 border-b border-gray-200 bg-gray-50 flex-none">
                 <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 mb-3">
                     근처 병원 목록
                 </h2>
@@ -144,8 +144,8 @@ const HospitalList: React.FC = () => {
                 </div>
             </div>
 
-            {/* 스크롤 가능한 리스트 영역 */}
-            <ul className="flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar">
+            {/* 스크롤 가능한 리스트 영역 (여백/패딩 최소화) */}
+            <ul className="flex-1 overflow-y-auto custom-scrollbar">
                 {filteredHospitals.map((hospital) => {
                     // 상태 관리에서 선택된 ID와 현재 아이템이 일치하면 하이라이트 CSS 적용
                     const isSelected = selectedHospitalId === hospital.id;
@@ -155,15 +155,15 @@ const HospitalList: React.FC = () => {
                             key={hospital.id}
                             ref={(el) => { itemRefs.current[hospital.id] = el; }}
                             onClick={() => handleSelectHospital(hospital.id)}
-                            className={`p-4 rounded-xl cursor-pointer transition-all duration-200 border ${isSelected
-                                ? 'bg-blue-50 border-blue-500 shadow-md transform scale-[1.02]'
-                                : 'bg-white border-gray-200 hover:border-blue-300 hover:bg-gray-50 hover:shadow-sm'
+                            className={`p-3 cursor-pointer transition-colors duration-150 border-b ${isSelected
+                                ? 'bg-[#e8f0fe] border-l-4 border-l-[#4285F4] border-b-gray-200'
+                                : 'bg-white border-gray-200 border-l-4 border-l-transparent hover:bg-gray-50'
                                 }`}
                         >
-                            <h3 className={`font-bold text-lg mb-1 ${isSelected ? 'text-blue-700' : 'text-gray-800'}`}>
+                            <h3 className={`font-bold text-base mb-1 ${isSelected ? 'text-[#4285F4]' : 'text-gray-900'}`}>
                                 {hospital.name}
                             </h3>
-                            <p className="text-sm text-gray-500 mb-2 truncate" title={hospital.address}>
+                            <p className="text-xs text-gray-500 mb-2 truncate" title={hospital.address}>
                                 {hospital.address}
                             </p>
                             <div className="flex items-center justify-between">

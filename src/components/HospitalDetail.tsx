@@ -34,7 +34,7 @@ const HospitalDetail: React.FC = () => {
     const distance = (getDistanceInMeters(centerLat, centerLng, Number(hospital.lat), Number(hospital.lng)) / 1000).toFixed(1);
 
     return (
-        <div className="absolute inset-y-0 left-0 w-full md:w-[350px] lg:w-[400px] bg-white shadow-2xl z-20 flex flex-col transform transition-transform duration-300 ease-in-out border-r border-gray-200">
+        <div className="w-full h-full bg-white flex flex-col">
             {/* Header: 뒤로가기 버튼 */}
             <div className="p-3 border-b border-gray-200 bg-white sticky top-0 z-10 shadow-sm">
                 <button

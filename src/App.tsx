@@ -37,20 +37,25 @@ const App: React.FC = () => {
   const selectedHospitalId = useSelector((state: RootState) => state.hospital.selectedHospitalId);
 
   return (
-    <div className="w-screen h-screen flex flex-row overflow-hidden bg-white text-gray-800 font-sans">
-      {/* 왼쪽: 병원 목록 (고정 너비 또는 반응형 비율) */}
-      <div className="relative w-full md:w-[350px] lg:w-[400px] h-full shadow-lg z-10 overflow-hidden">
-        {/* 선택 여부에 따라 슬라이드 애니메이션 처리 가능하도록 구조 개선 */}
-        <div className={`absolute inset-0 transition-transform duration-300 ${selectedHospitalId ? '-translate-x-full' : 'translate-x-0'}`}>
-          <HospitalList />
-        </div>
-        <div className={`absolute inset-0 transition-transform duration-300 shadow-2xl z-20 ${selectedHospitalId ? 'translate-x-0' : 'translate-x-full'}`}>
-          <HospitalDetail />
-        </div>
+    <div className="w-screen h-screen flex flex-col md:flex-row overflow-hidden bg-white text-gray-800 font-sans">
+      {/* 
+        왼쪽 패널: 상세 정보가 열렸을 땐 HospitalDetail, 평소엔 HospitalList 노출.
+        웹 풀사이즈 대응 (md:w-[450px] 등 고정 혹은 유연한 사이드바 너비)
+      */}
+      <div className="relative w-full md:w-[400px] lg:w-[450px] h-[50vh] md:h-full shadow-[4px_0_24px_rgba(0,0,0,0.08)] z-20 overflow-hidden flex flex-col bg-white">
+        {selectedHospitalId ? (
+          <div className="w-full h-full animate-slideInLeft">
+            <HospitalDetail />
+          </div>
+        ) : (
+          <div className="w-full h-full animate-fadeIn">
+            <HospitalList />
+          </div>
+        )}
       </div>
 
-      {/* 오른쪽: 네이버 지도 */}
-      <div className="flex-1 h-full relative">
+      {/* 오른쪽 패널: 구글 지도 (나머지 영역 전체 차지) */}
+      <div className="flex-1 w-full h-[50vh] md:h-full relative z-10 bg-gray-100">
         <HospitalMap />
       </div>
     </div>

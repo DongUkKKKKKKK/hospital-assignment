@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { setSelectedHospitalId, setFilter } from '../store/slices/hospitalSlice';
+import { getDistanceInMeters } from '../utils/distance';
 
 /**
  * 전역 상태에서 병원 목록을 가져와 렌더링하고, 진료과목 필터링 기능을 제공하는 리스트 컴포넌트.
@@ -11,9 +12,13 @@ const HospitalList: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
 
     // 스토어에서 상태 가져오기
-    const { hospitals, selectedHospitalId, filter, status } = useSelector(
+    const { hospitals, selectedHospitalId, filter, status, userLocation } = useSelector(
         (state: RootState) => state.hospital
     );
+
+    // 사용자 위치가 없을 경우 서울 시청을 기본값으로 사용
+    const centerLat = userLocation ? userLocation.lat : 37.5666805;
+    const centerLng = userLocation ? userLocation.lng : 126.9784147;
 
     // 병원 진료 과목 고유 목록 추출 (필터 드롭다운용)
     const departments = useMemo(() => {
@@ -26,9 +31,18 @@ const HospitalList: React.FC = () => {
      * 뷰에 렌더링될 실제 목록입니다.
      */
     const filteredHospitals = useMemo(() => {
-        if (filter === '전체') return hospitals;
-        return hospitals.filter((h) => h.department === filter);
-    }, [hospitals, filter]);
+        let result = hospitals;
+        if (filter !== '전체') {
+            result = hospitals.filter((h) => h.department === filter);
+        }
+
+        // 사용자 위치(혹은 기본 좌표) 기준으로 거리순 정렬 배치
+        return [...result].sort((a, b) => {
+            const distA = getDistanceInMeters(centerLat, centerLng, Number(a.lat), Number(a.lng));
+            const distB = getDistanceInMeters(centerLat, centerLng, Number(b.lat), Number(b.lng));
+            return distA - distB;
+        });
+    }, [hospitals, filter, centerLat, centerLng]);
 
     // 필터 변경 핸들러
     const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -94,8 +108,13 @@ const HospitalList: React.FC = () => {
                             <p className="text-sm text-gray-500 mb-2 truncate" title={hospital.address}>
                                 {hospital.address}
                             </p>
-                            <div className="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 uppercase tracking-wider">
-                                {hospital.department}
+                            <div className="flex items-center justify-between">
+                                <div className="inline-block px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 uppercase tracking-wider">
+                                    {hospital.department}
+                                </div>
+                                <span className="text-xs font-medium text-gray-500">
+                                    거리: {(getDistanceInMeters(centerLat, centerLng, Number(hospital.lat), Number(hospital.lng)) / 1000).toFixed(1)}km
+                                </span>
                             </div>
                         </li>
                     );

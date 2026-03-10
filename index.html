@@ -1,17 +1,21 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Hospital Map Search</title>
-    <!-- 네이버 지도 API 스크립트. 클라이언트 ID는 .env.local 파일에서 가져옵니다 -->
-    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=%VITE_NAVER_MAPS_CLIENT_ID%&submodules=geocoder"></script>
-    <!-- 마커 클러스터링 라이브러리 (오픈소스 제공) -->
-    <script type="text/javascript" src="https://rawgit.com/navermaps/marker-tools.js/master/marker-clustering/src/MarkerClustering.js"></script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hospital Map Search</title>
+  <!-- 네이버 지도 API 스크립트. 클라이언트 ID는 .env.local 파일에서 가져옵니다 -->
+  <script type="text/javascript"
+    src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=%VITE_NAVER_CLIENT_ID%&submodules=geocoder"></script>
+  <!-- 마커 클러스터링 라이브러리 (로컬 서빙) -->
+  <script type="text/javascript" src="/MarkerClustering.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>

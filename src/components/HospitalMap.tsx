@@ -12,7 +12,7 @@ const HospitalMap: React.FC = () => {
     const mapElement = useRef<HTMLDivElement>(null);
     const dispatch = useDispatch<AppDispatch>();
 
-    const { hospitals, filter, userLocation, selectedHospitalId } = useSelector(
+    const { hospitals, filter, userLocation, selectedHospitalId, status } = useSelector(
         (state: RootState) => state.hospital
     );
 
@@ -55,6 +55,11 @@ const HospitalMap: React.FC = () => {
             return;
         }
 
+        // MSW 데이터 로딩이 완료된 후에만 마커를 렌더링합니다.
+        if (status !== 'succeeded') {
+            return;
+        }
+
         // 기존 마커 및 클러스터러 제거 (초기화)
         markersRef.current.forEach(marker => marker.setMap(null));
         markersRef.current = [];
@@ -73,7 +78,8 @@ const HospitalMap: React.FC = () => {
         const newMarkers: naver.maps.Marker[] = [];
 
         filteredHospitals.forEach((hospital) => {
-            const position = new window.naver.maps.LatLng(hospital.lat, hospital.lng);
+            // hospital.json에서 가져온 값이 문자열일 수 있으므로 명시적으로 Number()로 변환합니다.
+            const position = new window.naver.maps.LatLng(Number(hospital.lat), Number(hospital.lng));
 
             const marker = new window.naver.maps.Marker({
                 position,

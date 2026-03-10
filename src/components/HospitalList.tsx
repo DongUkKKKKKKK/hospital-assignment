@@ -74,14 +74,15 @@ const HospitalList: React.FC = () => {
                     <div className="h-6 bg-gray-300 rounded w-1/3 mb-4"></div>
                     <div className="h-10 bg-gray-200 rounded mb-2 w-full"></div>
                 </div>
+                {/* 실감나는 Skeleton UI */}
                 <div className="flex-1 p-4 space-y-4">
                     {[...Array(6)].map((_, i) => (
-                        <div key={i} className="p-4 rounded-xl border border-gray-100 animate-pulse flex flex-col space-y-3">
+                        <div key={i} className="p-5 rounded-xl border border-gray-100 animate-pulse flex flex-col space-y-3 bg-white shadow-sm">
                             <div className="h-5 bg-gray-300 rounded w-3/4"></div>
-                            <div className="h-4 bg-gray-200 rounded w-full"></div>
-                            <div className="flex justify-between items-center mt-2">
-                                <div className="h-6 bg-gray-200 rounded-full w-20"></div>
-                                <div className="h-4 bg-gray-200 rounded w-12"></div>
+                            <div className="h-3 bg-gray-200 rounded w-full"></div>
+                            <div className="flex justify-between items-center mt-3 pt-2 border-t border-gray-50">
+                                <div className="h-5 bg-gray-200 rounded-full w-16"></div>
+                                <div className="h-3 bg-gray-200 rounded w-10"></div>
                             </div>
                         </div>
                     ))}
@@ -167,8 +168,12 @@ const HospitalList: React.FC = () => {
                     );
                 })}
                 {filteredHospitals.length === 0 && (
-                    <li className="p-8 text-center text-gray-500">
-                        조건에 맞는 병원이 없습니다.
+                    <li className="p-12 flex flex-col items-center justify-center text-center h-full">
+                        <svg className="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <p className="text-lg font-bold text-gray-600">주변에 해당 진료과 병원이 없습니다.</p>
+                        <p className="text-sm text-gray-400 mt-2">다른 진료 과목을 선택하거나 검색 범위를 넓혀보세요.</p>
                     </li>
                 )}
             </ul>

@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useMemo, useState, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { GoogleMap, useJsApiLoader, InfoWindow } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, InfoWindow, Marker } from '@react-google-maps/api';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import type { RootState, AppDispatch } from '../store';
 import { setSelectedHospitalId } from '../store/slices/hospitalSlice';
+import { getDistanceInMeters } from '../utils/distance';
 
 const mapContainerStyle = { width: '100%', height: '100%' };
 const defaultCenter = { lat: 37.5665, lng: 126.978 }; // 서울시청 Fallback
@@ -24,6 +25,7 @@ const HospitalMap: React.FC = () => {
     const { isLoaded, loadError } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
+        language: 'ko', // 한국어 지원
     });
 
     const [map, setMap] = useState<google.maps.Map | null>(null);
@@ -140,6 +142,22 @@ const HospitalMap: React.FC = () => {
                         zoomControl: true,
                     }}
                 >
+                    {/* 내 위치 마커 (특수 아이콘) */}
+                    {userLocation && (
+                        <Marker
+                            position={{ lat: userLocation.lat, lng: userLocation.lng }}
+                            icon={{
+                                path: window.google.maps.SymbolPath.CIRCLE,
+                                scale: 8,
+                                fillColor: '#3b82f6',
+                                fillOpacity: 1,
+                                strokeColor: '#ffffff',
+                                strokeWeight: 2,
+                            }}
+                            title="내 위치"
+                        />
+                    )}
+
                     {/* 선택 시 나타나는 정보 창 (Info Window) */}
                     {infoWindowData && (
                         <InfoWindow
@@ -147,16 +165,42 @@ const HospitalMap: React.FC = () => {
                             onCloseClick={() => dispatch(setSelectedHospitalId(null))}
                             options={{ pixelOffset: new window.google.maps.Size(0, -30) }}
                         >
-                            <div className="p-3 bg-white rounded-lg min-w-[200px]">
-                                <h4 className="font-bold text-gray-800 text-base mb-1">{infoWindowData.content.name}</h4>
-                                <p className="text-gray-600 text-xs mb-2">{infoWindowData.content.address}</p>
-                                <span className="inline-block px-2 py-1 text-[10px] font-semibold bg-blue-100 text-blue-800 rounded-full">
+                            <div className="p-3 bg-white rounded-lg min-w-[200px] text-center">
+                                <h4 className="font-bold text-gray-800 text-sm mb-1">{infoWindowData.content.name}</h4>
+                                <span className="inline-block px-2 py-1 text-[10px] font-semibold bg-blue-100 text-blue-800 rounded-full mb-1">
                                     {infoWindowData.content.department}
                                 </span>
+                                <p className="text-[11px] text-gray-500 font-medium">
+                                    현재 위치에서 {(getDistanceInMeters(
+                                        userLocation?.lat || defaultCenter.lat,
+                                        userLocation?.lng || defaultCenter.lng,
+                                        Number(infoWindowData.content.lat),
+                                        Number(infoWindowData.content.lng)
+                                    ) / 1000).toFixed(1)}km
+                                </p>
                             </div>
                         </InfoWindow>
                     )}
                 </GoogleMap>
+            )}
+
+            {/* 플로팅 내 위치로 이동 버튼 */}
+            {isLoaded && status === 'succeeded' && userLocation && (
+                <button
+                    onClick={() => {
+                        if (map) {
+                            map.panTo({ lat: userLocation.lat, lng: userLocation.lng });
+                            map.setZoom(14);
+                        }
+                    }}
+                    className="absolute bottom-6 right-6 bg-white p-3 rounded-full shadow-lg border border-gray-200 hover:bg-gray-50 hover:scale-105 transition-all z-10 flex items-center justify-center group"
+                    title="내 위치로 이동"
+                >
+                    <svg className="w-6 h-6 text-blue-600 group-hover:text-blue-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </button>
             )}
         </div>
     );

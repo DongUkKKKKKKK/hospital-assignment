@@ -8,9 +8,8 @@
 본 프로젝트는 최신 React(18)와 Vite 환경에서 구성되었습니다. 프로젝트 실행 전, 반드시 컴포넌트 의존성을 설치하고 루트 경로에 `.env.local` 파일을 세팅해야 합니다.
 
 ```bash
-# 1. 패키지 및 의존성 환경 설치 (Google Maps 필수 모듈 포함)
+# 1. 패키지 및 의존성 설치
 npm install
-npm install @react-google-maps/api @googlemaps/markerclusterer
 
 # 2. 구글 지도 API 키 세팅
 # 프로젝트 루트 디렉토리에 .env.local 파일을 생성하고 아래와 같이 내용을 작성합니다.

@@ -156,15 +156,15 @@ const HospitalList: React.FC = () => {
                             key={hospital.id}
                             ref={(el) => { itemRefs.current[hospital.id] = el; }}
                             onClick={() => handleSelectHospital(hospital.id)}
-                            className={`p-3 cursor-pointer transition-colors duration-150 border-b ${isSelected
-                                ? 'bg-[#e8f0fe] border-l-4 border-l-[#4285F4] border-b-gray-200'
-                                : 'bg-white border-gray-200 border-l-4 border-l-transparent hover:bg-gray-50'
+                            className={`p-4 cursor-pointer transition-colors duration-200 border-b ${isSelected
+                                ? 'bg-blue-50 border-l-4 border-l-blue-500 border-b-gray-200'
+                                : 'bg-white border-gray-100 border-l-4 border-l-transparent hover:bg-blue-50'
                                 }`}
                         >
-                            <h3 className={`font-bold text-base mb-1 ${isSelected ? 'text-[#4285F4]' : 'text-gray-900'}`}>
+                            <h3 className={`font-bold text-lg mb-1 ${isSelected ? 'text-blue-600' : 'text-gray-900'}`}>
                                 {hospital.name}
                             </h3>
-                            <p className="text-xs text-gray-500 mb-2 truncate" title={hospital.address}>
+                            <p className="text-sm text-gray-500 mb-3 truncate" title={hospital.address}>
                                 {hospital.address}
                             </p>
                             <div className="flex items-center justify-between">

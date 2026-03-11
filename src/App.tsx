@@ -37,7 +37,7 @@ const App: React.FC = () => {
   const selectedHospitalId = useSelector((state: RootState) => state.hospital.selectedHospitalId);
 
   return (
-    <div className="flex w-screen h-screen overflow-hidden text-gray-900 bg-white">
+    <div className="flex w-full h-screen overflow-hidden text-gray-900">
       {/* 
         왼쪽 패널: 상세 정보가 열렸을 땐 HospitalDetail, 평소엔 HospitalList 노출.
       */}

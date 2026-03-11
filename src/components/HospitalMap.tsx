@@ -175,10 +175,10 @@ const HospitalMap: React.FC = () => {
                             onCloseClick={() => dispatch(setSelectedHospitalId(null))}
                             options={{ pixelOffset: new window.google.maps.Size(0, -30) }}
                         >
-                            <div className="p-3 bg-white rounded-lg min-w-[200px] text-center">
-                                <h4 className="font-bold text-gray-800 text-sm mb-1">{infoWindowData.content.name}</h4>
-                                <span className="inline-block px-2 py-1 text-[10px] font-semibold bg-blue-100 text-blue-800 rounded-full mb-1">
-                                    {DEPARTMENT_MAP[infoWindowData.content.department?.toUpperCase()] || infoWindowData.content.department}
+                            <div className="p-3 bg-white min-w-[200px] text-center">
+                                <h4 className="font-bold text-gray-900 text-base mb-1.5">{infoWindowData.content.name}</h4>
+                                <span className="inline-block px-2.5 py-1 text-[11px] font-semibold bg-blue-50 text-blue-600 rounded-md mb-2">
+                                    {DEPARTMENT_MAP[String(infoWindowData.content.department).toUpperCase()] || infoWindowData.content.department}
                                 </span>
                                 <p className="text-[11px] text-gray-500 font-medium">
                                     현재 위치에서 {(getDistanceInMeters(
@@ -194,7 +194,7 @@ const HospitalMap: React.FC = () => {
                 </GoogleMap>
             )}
 
-            {/* 플로팅 내 위치로 이동 버튼 (대형/명시적 UX 개선) */}
+            {/* 플로팅 내 위치로 이동 버튼 (세련된 UX 버전) */}
             {isLoaded && status === 'succeeded' && userLocation && (
                 <button
                     onClick={() => {
@@ -203,14 +203,12 @@ const HospitalMap: React.FC = () => {
                             map.setZoom(15);
                         }
                     }}
-                    className="absolute bottom-10 right-10 bg-[#4285F4] hover:bg-blue-700 text-white px-5 py-3.5 rounded-full shadow-2xl border-2 border-white hover:scale-105 transition-all duration-300 z-[100] flex items-center justify-center space-x-2 font-bold group"
-                    title="내 위치로 바로가기"
+                    className="absolute bottom-28 right-6 w-12 h-12 bg-white text-blue-600 rounded-full shadow-xl hover:bg-gray-50 flex items-center justify-center transition-all duration-200 z-[100] group"
+                    title="내 위치 찾기"
                 >
-                    <svg className="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                     </svg>
-                    <span>내 위치 찾기</span>
                 </button>
             )}
         </div>

@@ -5,7 +5,6 @@ import type { AppDispatch, RootState } from './store';
 import HospitalList from './components/HospitalList';
 import HospitalMap from './components/HospitalMap';
 import HospitalDetail from './components/HospitalDetail';
-import './App.css'; // Vite 기본 CSS 임시 유지
 
 const App: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

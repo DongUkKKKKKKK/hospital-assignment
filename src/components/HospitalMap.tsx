@@ -9,6 +9,16 @@ import { getDistanceInMeters } from '../utils/distance';
 const mapContainerStyle = { width: '100%', height: '100%' };
 const defaultCenter = { lat: 37.5665, lng: 126.978 }; // 서울시청 Fallback
 
+const DEPARTMENT_MAP: Record<string, string> = {
+    INTERNAL: '내과',
+    ORTHOPEDIC: '정형외과',
+    PEDIATRIC: '소아과',
+    OPHTHALMOLOGY: '안과',
+    DERMATOLOGY: '피부과',
+    DENTAL: '치과',
+    GENERAL: '일반의원'
+};
+
 /**
  * @description Google Maps 기반 병원 지도 컴포넌트
  * - @react-google-maps/api: React 기반 선언적 맵 렌더링
@@ -168,7 +178,7 @@ const HospitalMap: React.FC = () => {
                             <div className="p-3 bg-white rounded-lg min-w-[200px] text-center">
                                 <h4 className="font-bold text-gray-800 text-sm mb-1">{infoWindowData.content.name}</h4>
                                 <span className="inline-block px-2 py-1 text-[10px] font-semibold bg-blue-100 text-blue-800 rounded-full mb-1">
-                                    {infoWindowData.content.department}
+                                    {DEPARTMENT_MAP[infoWindowData.content.department?.toUpperCase()] || infoWindowData.content.department}
                                 </span>
                                 <p className="text-[11px] text-gray-500 font-medium">
                                     현재 위치에서 {(getDistanceInMeters(

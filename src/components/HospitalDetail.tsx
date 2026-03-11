@@ -10,7 +10,8 @@ const DEPARTMENT_MAP: Record<string, string> = {
     PEDIATRIC: '소아과',
     OPHTHALMOLOGY: '안과',
     DERMATOLOGY: '피부과',
-    DENTAL: '치과'
+    DENTAL: '치과',
+    GENERAL: '일반의원'
 };
 
 const HospitalDetail: React.FC = () => {
@@ -64,7 +65,7 @@ const HospitalDetail: React.FC = () => {
                         {hospital.name}
                     </h2>
                     <span className="inline-block px-3 py-1.5 text-sm font-semibold rounded-full bg-blue-100 text-blue-800 tracking-wider">
-                        {DEPARTMENT_MAP[hospital.department] || hospital.department}
+                        {DEPARTMENT_MAP[hospital.department?.toUpperCase()] || hospital.department}
                     </span>
                 </div>
 

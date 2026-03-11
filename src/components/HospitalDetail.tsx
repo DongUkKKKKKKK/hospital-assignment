@@ -3,16 +3,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { setSelectedHospitalId } from '../store/slices/hospitalSlice';
 import { getDistanceInMeters } from '../utils/distance';
+import { DEPARTMENT_MAP } from '../constants'; // 의존성 역전: 공통 상수 참조
 
-const DEPARTMENT_MAP: Record<string, string> = {
-    INTERNAL: '내과',
-    ORTHOPEDIC: '정형외과',
-    PEDIATRIC: '소아과',
-    OPHTHALMOLOGY: '안과',
-    DERMATOLOGY: '피부과',
-    DENTAL: '치과',
-    GENERAL: '일반의원'
-};
+/**
+ * @description 단일 병원 상세 정보를 렌더링하는 UI 컴포넌트
+ * - 단방향 데이터 흐름: Redux Store의 selectedHospitalId를 구독하여 순수 렌더링
+ * - 사용자 입력 방어: React 기본 매커니즘을 통한 XSS 방어(dangerouslySetInnerHTML 미사용)
+ */
 
 const HospitalDetail: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();

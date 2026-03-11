@@ -3,20 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { setSelectedHospitalId, setFilter, fetchHospitals } from '../store/slices/hospitalSlice';
 import { getDistanceInMeters } from '../utils/distance';
-
-const DEPARTMENT_MAP: Record<string, string> = {
-    INTERNAL: '내과',
-    ORTHOPEDIC: '정형외과',
-    PEDIATRIC: '소아과',
-    OPHTHALMOLOGY: '안과',
-    DERMATOLOGY: '피부과',
-    DENTAL: '치과',
-    GENERAL: '일반의원'
-};
+import { DEPARTMENT_MAP } from '../constants'; // 공통 상수 의존성 주입 (Clean Architecture)
 
 /**
- * 전역 상태에서 병원 목록을 가져와 렌더링하고, 진료과목 필터링 기능을 제공하는 리스트 컴포넌트.
- * 선택된 병원 항목을 지도와 동기화하여 강조 표시(Highlight) 합니다.
+ * @description 병원 목록을 렌더링하고 필터링하는 왼쪽 패널 컴포넌트
+ * - 관심사 분리(SoC): 데이터 fetching 및 상태는 Redux에서, UI 렌더링 및 로컬 성능 최적화(useMemo)는 이 컴포넌트가 전담합니다.
+ * - 확장성 및 방어: 상수(DEPARTMENT_MAP) 분리 및 대소문자 방어 코드를 적용했습니다.
  */
 const HospitalList: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();

@@ -5,24 +5,15 @@ import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import type { RootState, AppDispatch } from '../store';
 import { setSelectedHospitalId } from '../store/slices/hospitalSlice';
 import { getDistanceInMeters } from '../utils/distance';
+import { DEPARTMENT_MAP } from '../constants'; // 의존성 역전: 공통 상수 참조
 
 const mapContainerStyle = { width: '100%', height: '100%', margin: 0, padding: 0, display: 'block' };
 const defaultCenter = { lat: 37.5665, lng: 126.978 }; // 서울시청 Fallback
 
-const DEPARTMENT_MAP: Record<string, string> = {
-    INTERNAL: '내과',
-    ORTHOPEDIC: '정형외과',
-    PEDIATRIC: '소아과',
-    OPHTHALMOLOGY: '안과',
-    DERMATOLOGY: '피부과',
-    DENTAL: '치과',
-    GENERAL: '일반의원'
-};
-
 /**
  * @description Google Maps 기반 병원 지도 컴포넌트
- * - @react-google-maps/api: React 기반 선언적 맵 렌더링
- * - @googlemaps/markerclusterer: 바닐라 JS 기반 고성능 클러스터링(3천 건 마커 최적화)
+ * - 보안 (Security): API 키 환경변수 누락 예방 및 로드 실패 대응 방어 로직 포함
+ * - 확장성 (Architecture): 대량의 DOM 이벤트 핸들러(Marker) 최적화를 위해 클러스터러 라이브러리 연동
  */
 const HospitalMap: React.FC = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -31,10 +22,16 @@ const HospitalMap: React.FC = () => {
         (state: RootState) => state.hospital
     );
 
+    // [보안/회복탄력성 방어코드] 하드코딩된 API 키 제거 및 환경변수 주입 검사
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+        console.error("Critical Security Error: G-Map API Key is missing from Environment Variables.");
+    }
+
     // Google Maps 스크립트 비동기 로드
     const { isLoaded, loadError } = useJsApiLoader({
         id: 'google-map-script',
-        googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '',
+        googleMapsApiKey: apiKey || '',
         language: 'ko', // 한국어 지원
     });
 
@@ -121,11 +118,25 @@ const HospitalMap: React.FC = () => {
         }
     }, [map, selectedHospitalId, filteredHospitals]);
 
+    // 환경 변수 설정 오류 시 안전한 Fallback UI 렌더링
+    if (!apiKey) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full bg-red-50 relative p-6 text-center">
+                <p className="text-red-700 font-bold text-lg mb-2">Google Maps 로드 에러 (보안)</p>
+                <p className="text-sm text-red-600 mb-4">
+                    환경변수(VITE_GOOGLE_MAPS_API_KEY) 설정이 필요합니다.<br />
+                    루트 디렉토리의 <code>.env.local</code> 파일을 확인해주세요.
+                </p>
+            </div>
+        );
+    }
+
+    // 네트워크 오류 등으로 스크립트 로드 자체가 실패했을 경우
     if (loadError) {
         return (
-            <div className="flex flex-col items-center justify-center h-full bg-red-50 relative">
-                <p className="text-red-500 font-bold mb-2">Google Maps 로드 에러</p>
-                <p className="text-sm text-red-400">API Key 및 네트워크 상태를 확인하세요.</p>
+            <div className="flex flex-col items-center justify-center h-full bg-red-50 relative p-6 text-center">
+                <p className="text-red-700 font-bold text-lg mb-2">Google Maps 로드 에러 (네트워크)</p>
+                <p className="text-sm text-red-600">스크립트 소스를 받아오는 데 실패했습니다. 네트워크 상태를 확인하세요.</p>
             </div>
         );
     }

@@ -6,6 +6,12 @@ import HospitalList from './components/HospitalList';
 import HospitalMap from './components/HospitalMap';
 import HospitalDetail from './components/HospitalDetail';
 
+/**
+ * @description 애플리케이션의 최상위 루트 레이아웃 (Layout Container)
+ * - Full-Bleed Layout: 브라우저의 모든 틈새와 여백을 제거하는 강제 리셋(m-0 p-0 box-border)
+ * - Flexbox Layout: 좌측 고정 패널(400px, flex-shrink-0)과 우측 가변 지도(flex-grow) 구조 확립
+ * - 단일 진입점: 앱 초기 로드 시 Geolocation API 및 MSW 팩토리 연동 지점
+ */
 const App: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 

@@ -193,7 +193,7 @@ const HospitalMap: React.FC = () => {
                             map.setZoom(15);
                         }
                     }}
-                    className="absolute bottom-8 right-8 bg-[#4285F4] hover:bg-blue-700 text-white px-5 py-3.5 rounded-full shadow-2xl border-2 border-white hover:scale-105 transition-all duration-300 z-10 flex items-center justify-center space-x-2 font-bold group"
+                    className="absolute bottom-10 right-10 bg-[#4285F4] hover:bg-blue-700 text-white px-5 py-3.5 rounded-full shadow-2xl border-2 border-white hover:scale-105 transition-all duration-300 z-[100] flex items-center justify-center space-x-2 font-bold group"
                     title="내 위치로 바로가기"
                 >
                     <svg className="w-6 h-6 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">

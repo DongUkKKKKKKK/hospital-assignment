@@ -37,11 +37,11 @@ const App: React.FC = () => {
   const selectedHospitalId = useSelector((state: RootState) => state.hospital.selectedHospitalId);
 
   return (
-    <div className="flex w-full h-screen overflow-hidden bg-white text-gray-800 font-sans">
+    <div className="flex w-screen h-screen overflow-hidden text-gray-900 bg-white">
       {/* 
         왼쪽 패널: 상세 정보가 열렸을 땐 HospitalDetail, 평소엔 HospitalList 노출.
       */}
-      <div className="relative w-[350px] md:w-[400px] h-full z-20 overflow-hidden flex flex-col bg-white">
+      <aside className="relative w-[350px] md:w-[400px] h-full shadow-md z-20 overflow-hidden flex flex-col bg-white">
         {selectedHospitalId ? (
           <div className="w-full h-full animate-slideInLeft">
             <HospitalDetail />
@@ -51,12 +51,12 @@ const App: React.FC = () => {
             <HospitalList />
           </div>
         )}
-      </div>
+      </aside>
 
       {/* 오른쪽 패널: 구글 지도 (나머지 영역 전체 차지) gap 0 */}
-      <div className="flex-1 h-full relative z-10 bg-gray-100">
+      <main className="flex-1 h-full relative z-10 bg-gray-100">
         <HospitalMap />
-      </div>
+      </main>
     </div>
   );
 };

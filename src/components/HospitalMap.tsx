@@ -6,7 +6,7 @@ import type { RootState, AppDispatch } from '../store';
 import { setSelectedHospitalId } from '../store/slices/hospitalSlice';
 import { getDistanceInMeters } from '../utils/distance';
 
-const mapContainerStyle = { width: '100%', height: '100%' };
+const mapContainerStyle = { width: '100%', height: '100%', margin: 0, padding: 0, display: 'block' };
 const defaultCenter = { lat: 37.5665, lng: 126.978 }; // 서울시청 Fallback
 
 const DEPARTMENT_MAP: Record<string, string> = {
@@ -148,8 +148,16 @@ const HospitalMap: React.FC = () => {
                     onLoad={onLoad}
                     onUnmount={onUnmount}
                     options={{
-                        disableDefaultUI: true,
-                        zoomControl: true,
+                        disableDefaultUI: true, // 구글 기본 UI(지도 유형, 스트리트뷰 등) 모두 제거
+                        zoomControl: true, // 줌 컨트롤(+/-)만 명시적으로 활성화
+                        zoomControlOptions: {
+                            position: window.google.maps.ControlPosition.RIGHT_BOTTOM,
+                        },
+                        mapTypeControl: false,
+                        scaleControl: true,
+                        streetViewControl: false,
+                        rotateControl: false,
+                        fullscreenControl: false,
                     }}
                 >
                     {/* 내 위치 마커 (특수 아이콘) */}
@@ -194,7 +202,7 @@ const HospitalMap: React.FC = () => {
                 </GoogleMap>
             )}
 
-            {/* 플로팅 내 위치로 이동 버튼 (세련된 UX 버전) */}
+            {/* 플로팅 내 위치로 이동 버튼 (세련된 UX 버전 - 줌 컨트롤러 바로 위 정렬) */}
             {isLoaded && status === 'succeeded' && userLocation && (
                 <button
                     onClick={() => {
@@ -203,7 +211,7 @@ const HospitalMap: React.FC = () => {
                             map.setZoom(15);
                         }
                     }}
-                    className="absolute bottom-28 right-6 w-12 h-12 bg-white text-blue-600 rounded-full shadow-xl hover:bg-gray-50 flex items-center justify-center transition-all duration-200 z-[100] group"
+                    className="absolute bottom-[108px] right-2.5 w-10 h-10 bg-white text-blue-600 rounded shadow-[0_2px_6px_rgba(0,0,0,0.3)] hover:bg-gray-50 flex items-center justify-center transition-all duration-200 z-[100] group"
                     title="내 위치 찾기"
                 >
                     <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">

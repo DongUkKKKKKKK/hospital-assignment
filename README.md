@@ -56,7 +56,21 @@ npm run dev
 - **문제**: 브라우저 권한 설정으로 인해 사용자의 위치값(`getCurrentPosition`)을 제공받지 못해 무한 로딩 창에서 맵이 중단되는 엣지 케이스가 있었습니다.
 - **해결 방안**: 거부 콜백 시 `alert` 안내를 우선적으로 띄운 직후, Redux Action을 통해 **서울시청(37.5665, 126.978)**을 예외 Fallback 위치 값으로 즉시 강제 수동 전달합니다. 이를 통해 애플리케이션의 거리 계산 및 지도 맵뷰 초기화 기능이 막히는 것을 방어했습니다.
 
----
 
 
 
+
+### 1. 보안 및 방어적 설계 (Security & Defense)
+*   **API Key 환경변수 은닉 및 예외 핸들링**: 구글 맵 API 키를 하드코딩하지 않고 `import.meta.env`로 안전하게 주입했습니다. 특히 키 누락 시 리액트 컴포넌트 레벨에서 `if (!apiKey)` 방어 로직을 통해 맵이 터지지 않고 "환경변수 설정이 필요하다"는 명확한 에러 UI를 반환하도록 회복 탄력성(Resilience)을 설계했습니다.
+*   **XSS(Cross-Site Scripting) 방어**: 사용자나 API로부터 주입되는 문자열(`hospital.name`, `address` 등)을 렌더링할 때 `dangerouslySetInnerHTML`의 사용을 원천 배제하고, React의 기본 JSX 이스케이프(Escape) 매커니즘을 100% 신뢰하도록 설계하여 악성 스크립트 주입을 차단했습니다.
+
+### 2. 안티 스파게티 및 클린 아키텍처 (Clean Architecture)
+*   **의존성 역전 및 공통 상수 격리**: 기존 UI 컴포넌트 내부에 산재해있던 `DEPARTMENT_MAP` 로직을 `src/constants/index.ts`로 완벽히 분리했습니다. UI 컴포넌트는 단지 상수(의존성)를 주입받아 쓰기만 하므로 유지보수성이 극대화되었습니다.
+*   **관심사 분리 (SoC)**: 데이터의 라이프사이클(Fetch, State)은 전담 상태관리자인 Redux Slice가, 화면 표출과 인터랙션은 React Component가 전담하게 역할을 나눴습니다.
+
+### 3. 성능 및 렌더링 최적화
+*   **하버사인 모델 불안정성 제어**: 3,000건의 데이터를 하버사인 공식으로 순회 계산할 때, React 렌더링 사이클에 묶여 무한 재계산되는 무한 렉을 막고자 `useMemo`와 필터값(`filter`)을 연동시켰습니다.
+*   **Marker Clusterer 도입**: DOM 노드를 3,000개나 구글맵 캔버스에 주입하면 브라우저 메모리 누수와 렉이 유발됩니다. `@googlemaps/markerclusterer` 라이브러리를 통해 화면 줌(Zoom) 비율에 맞춰 그리드 단위로 연산 개수를 O(n) 미만으로 감쇄시켰습니다.
+
+### 4. 네이티브 앱 수준 UX (Full-Bleed Layout)
+*   웹 기본 제공 여백(Margin/Padding)을 리셋(`m-0 p-0 box-border`)하고 꽉 찬 레이아웃(`w-full h-screen`) 설계와 `flex-shrink-0` 제약을 혼합하여, 브라우저가 Resize되더라도 리스트 영역이 찌그러지거나 1픽셀의 빈틈이 발생하지 않도록 강제했습니다.

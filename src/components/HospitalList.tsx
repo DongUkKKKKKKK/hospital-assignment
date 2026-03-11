@@ -38,12 +38,15 @@ const HospitalList: React.FC = () => {
             result = hospitals.filter((h) => h.department === filter);
         }
 
-        // 사용자 위치(혹은 기본 좌표) 기준으로 거리순 정렬 배치
-        return [...result].sort((a, b) => {
-            const distA = getDistanceInMeters(centerLat, centerLng, Number(a.lat), Number(a.lng));
-            const distB = getDistanceInMeters(centerLat, centerLng, Number(b.lat), Number(b.lng));
-            return distA - distB;
-        });
+        // 1. 결과 배열에 'distance' 값을 미리 계산해서 객체에 넣어줍니다.
+        // 이를 통해 렌더링(JSX 순회) 시마다 3000번 반복되던 하버사인 무거운 연산을 차단합니다.
+        const hospitalsWithDistance = result.map(hospital => ({
+            ...hospital,
+            distance: getDistanceInMeters(centerLat, centerLng, Number(hospital.lat), Number(hospital.lng))
+        }));
+
+        // 2. 미리 계산된 distance로 정렬합니다.
+        return hospitalsWithDistance.sort((a, b) => a.distance - b.distance);
     }, [hospitals, filter, centerLat, centerLng]);
 
     // 필터 변경 핸들러
@@ -164,7 +167,7 @@ const HospitalList: React.FC = () => {
                                     {DEPARTMENT_MAP[hospital.department?.toUpperCase()] || hospital.department}
                                 </div>
                                 <span className="text-xs font-medium text-gray-500">
-                                    거리: {(getDistanceInMeters(centerLat, centerLng, Number(hospital.lat), Number(hospital.lng)) / 1000).toFixed(1)}km
+                                    거리: {(hospital.distance / 1000).toFixed(1)}km
                                 </span>
                             </div>
                         </li>
